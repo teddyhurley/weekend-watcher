@@ -1,0 +1,21 @@
+# Credentials and local state
+.env
+.env.*
+!.env.example
+.watcher-code-backups/
+.cache/
+*.log
+# Dependencies and generated output
+node_modules/
+coverage/
+test-results/
+playwright-report/
+dist/
+*.zip
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+__pycache__/
+*.pyc

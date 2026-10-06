@@ -1,0 +1,16 @@
+{
+  "name": "weekend-watcher",
+  "version": "0.13.0",
+  "private": true,
+  "description": "Know what is on. Know why it matters. Global sports discovery, up to four weeks ahead.",
+  "scripts": {
+    "start": "node server/server.cjs",
+    "test": "node --test tests/*.test.cjs tests/current.test.js",
+    "check": "node scripts/check-project.cjs",
+    "preview": "node tests/preview-server.cjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "UNLICENSED"
+}

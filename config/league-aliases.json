@@ -1,0 +1,380 @@
+{
+  "Premier League": [
+    "English Premier League"
+  ],
+  "Championship": [
+    "English League Championship",
+    "English Championship"
+  ],
+  "La Liga": [
+    "Spanish La Liga"
+  ],
+  "Bundesliga": [
+    "German Bundesliga"
+  ],
+  "Serie A": [
+    "Italian Serie A"
+  ],
+  "Ligue 1": [
+    "French Ligue 1"
+  ],
+  "MLS": [
+    "American Major League Soccer",
+    "Major League Soccer"
+  ],
+  "Liga MX": [
+    "Mexican Primera League",
+    "Mexican Liga MX"
+  ],
+  "Brasileirão": [
+    "Brazilian Serie A",
+    "Brazilian Brasileirão Série A"
+  ],
+  "WSL": [
+    "English Womens Super League",
+    "English Women's Super League"
+  ],
+  "NWSL": [
+    "American National Womens Soccer League",
+    "National Women's Soccer League"
+  ],
+  "J1 League": [
+    "Japanese J1 League",
+    "Japanese J League"
+  ],
+  "K League 1": [
+    "South Korean K League 1",
+    "Korean K League 1"
+  ],
+  "A-League Men": [
+    "Australian A-League",
+    "Australian A-League Men"
+  ],
+  "A-League Women": [
+    "Australian A-League Women",
+    "Australian W-League"
+  ],
+  "Scottish Premiership": [
+    "Scottish Premier League"
+  ],
+  "Primeira Liga": [
+    "Portuguese Primeira Liga"
+  ],
+  "Eredivisie": [
+    "Dutch Eredivisie"
+  ],
+  "UEFA Conference League": [
+    "UEFA Europa Conference League"
+  ],
+  "Copa Libertadores": [
+    "CONMEBOL Libertadores"
+  ],
+  "UEFA Women’s Champions League": [
+    "UEFA Womens Champions League",
+    "UEFA Women's Champions League"
+  ],
+  "IPL": [
+    "Indian Premier League"
+  ],
+  "BBL": [
+    "Big Bash League",
+    "Australian Big Bash League"
+  ],
+  "PSL": [
+    "Pakistan Super League"
+  ],
+  "SA20": [
+    "South Africa SA20"
+  ],
+  "AFL": [
+    "Australian Football League",
+    "Australian AFL"
+  ],
+  "AFLW": [
+    "AFL Women",
+    "AFL Womens",
+    "AFL Women's"
+  ],
+  "NFL": [
+    "National Football League"
+  ],
+  "NBA": [
+    "National Basketball Association"
+  ],
+  "WNBA": [
+    "Women's National Basketball Association"
+  ],
+  "MLB": [
+    "Major League Baseball"
+  ],
+  "NPB": [
+    "Japanese Nippon Professional Baseball",
+    "Nippon Professional Baseball",
+    "Nippon Baseball League"
+  ],
+  "KBO": [
+    "Korean Baseball Organization",
+    "Korean KBO League",
+    "KBO League"
+  ],
+  "NHL": [
+    "National Hockey League"
+  ],
+  "EuroLeague": [
+    "Euroleague Basketball",
+    "Basketball Euroleague"
+  ],
+  "Top 14": [
+    "French Top 14"
+  ],
+  "URC": [
+    "United Rugby Championship"
+  ],
+  "NRL": [
+    "Australian NRL",
+    "National Rugby League",
+    "Australian National Rugby League"
+  ],
+  "NBL": [
+    "Australian NBL"
+  ],
+  "Formula 1": [
+    "Formula One"
+  ],
+  "ATP": [
+    "ATP World Tour",
+    "ATP Tour"
+  ],
+  "WTA": [
+    "WTA Tour"
+  ],
+  "Argentine Primera División": [
+    "Argentinian Primera Division"
+  ],
+  "Saudi Pro League": [
+    "Saudi-Arabian Pro League"
+  ],
+  "WE League": [
+    "Japanese WE League"
+  ],
+  "WNBL": [
+    "Australian WNBL"
+  ],
+  "KBL": [
+    "Korean Basketball League"
+  ],
+  "The Hundred · men": [
+    "The Hundred"
+  ],
+  "The Hundred · women": [
+    "The Hundred Women"
+  ],
+  "ILT20": [
+    "International League T20"
+  ],
+  "Super League": [
+    "English Rugby League Super League"
+  ],
+  "Premiership Rugby": [
+    "English Prem Rugby",
+    "English Premiership Rugby"
+  ],
+  "Super Rugby Pacific": [
+    "Super Rugby"
+  ],
+  "IndyCar": [
+    "IndyCar Series"
+  ],
+  "Supercars": [
+    "V8 Supercars"
+  ],
+  "DP World Tour": [
+    "European Tour"
+  ],
+  "KPGA Tour": [
+    "Korean Tour"
+  ],
+  "UFC": [
+    "Ultimate Fighting Championship"
+  ],
+  "ONE Championship": [
+    "ONE"
+  ],
+  "PFL": [
+    "Professional Fighters League"
+  ],
+  "UCI WorldTour · men": [
+    "UCI World Tour"
+  ],
+  "UCI Women’s WorldTour": [
+    "UCI Womens World Tour"
+  ],
+  "International cricket · men": [
+    "International Test Match Series",
+    "One Day International Series",
+    "Twenty20 International Series"
+  ],
+  "International football · men": [
+    "FIFA World Cup",
+    "UEFA Nations League",
+    "CONCACAF Nations League",
+    "AFC Asian Cup",
+    "AFC Asian Cup Qualifying",
+    "World Cup Qualifying AFC",
+    "World Cup Qualifying CAF",
+    "World Cup Qualifying CONCACAF",
+    "World Cup Qualifying CONMEBOL",
+    "World Cup Qualifying OFC",
+    "World Cup Qualifying UEFA"
+  ],
+  "International football · women": [
+    "FIFA Womens World Cup",
+    "UEFA Womens Euro",
+    "UEFA Womens Nations League",
+    "CONCACAF W Gold Cup"
+  ],
+  "International rugby": [
+    "Rugby World Cup",
+    "Six Nations Championship"
+  ],
+  "International rugby · women": [
+    "Six Nations Women",
+    "Womens Rugby World Cup"
+  ],
+  "FIBA internationals · men": [
+    "FIBA Basketball World Cup",
+    "FIBA EuroBasket"
+  ],
+  "FIBA internationals · women": [
+    "FIBA Womens World Cup",
+    "FIBA Womens AfroBasket",
+    "FIBA Womens AmeriCup",
+    "FIBA Womens Asia Cup"
+  ],
+  "International netball": [
+    "Netball World Cup",
+    "Constellation Cup",
+    "Netball Quad Series",
+    "Taini Jamison Trophy"
+  ],
+  "PWHL": [
+    "American PWHL"
+  ],
+  "PLL": [
+    "Premier Lacrosse League"
+  ],
+  "NLL": [
+    "National Lacrosse League"
+  ],
+  "B.PREMIER": [
+    "Japanese B1 League",
+    "B.League",
+    "B League",
+    "B1 League"
+  ],
+  "Major boxing cards": [
+    "Boxing"
+  ],
+  "PDC premier events": [
+    "PDC Darts"
+  ],
+  "NCAA FBS": [
+    "NCAA Division 1 Football",
+    "NCAA Division I Football",
+    "NCAA FBS",
+    "NCAA Football"
+  ],
+  "FA Cup": [
+    "FA Cup",
+    "English FA Cup"
+  ],
+  "Carabao Cup": [
+    "EFL Cup",
+    "English League Cup",
+    "Carabao Cup"
+  ],
+  "Copa del Rey": [
+    "Copa del Rey",
+    "Spanish Copa del Rey"
+  ],
+  "DFB-Pokal": [
+    "German DFB-Pokal",
+    "DFB-Pokal"
+  ],
+  "Coppa Italia": [
+    "Coppa Italia",
+    "Italian Coppa Italia"
+  ],
+  "Coupe de France": [
+    "French Coupe de France",
+    "Coupe de France"
+  ],
+  "Copa do Brasil": [
+    "Copa do Brasil",
+    "Brazilian Copa do Brasil"
+  ],
+  "FIFA World Cup": [
+    "FIFA World Cup"
+  ],
+  "FIFA World Cup Qualifying": [
+    "World Cup Qualifying AFC",
+    "World Cup Qualifying CAF",
+    "World Cup Qualifying CONCACAF",
+    "World Cup Qualifying CONMEBOL",
+    "World Cup Qualifying OFC",
+    "World Cup Qualifying UEFA"
+  ],
+  "UEFA Euro": [
+    "UEFA European Championship",
+    "UEFA Euro"
+  ],
+  "Copa América": [
+    "Copa America",
+    "Copa América"
+  ],
+  "Africa Cup of Nations": [
+    "Africa Cup of Nations",
+    "African Cup of Nations"
+  ],
+  "AFC Asian Cup": [
+    "AFC Asian Cup"
+  ],
+  "FIFA Women’s World Cup": [
+    "FIFA Womens World Cup",
+    "FIFA Women's World Cup"
+  ],
+  "UEFA Women’s Euro": [
+    "UEFA Womens Euro",
+    "UEFA Women's Euro"
+  ],
+  "ICC Cricket World Cup": [
+    "Cricket World Cup",
+    "ICC Cricket World Cup"
+  ],
+  "ICC Men’s T20 World Cup": [
+    "ICC Mens T20 World Cup",
+    "ICC Men's T20 World Cup"
+  ],
+  "ICC Champions Trophy": [
+    "ICC Champions Trophy"
+  ],
+  "ICC World Test Championship": [
+    "ICC World Test Championship"
+  ],
+  "ICC Women’s Cricket World Cup": [
+    "Womens Cricket World Cup",
+    "Women's Cricket World Cup",
+    "ICC Womens Cricket World Cup"
+  ],
+  "ICC Women’s T20 World Cup": [
+    "ICC Womens T20 World Cup",
+    "ICC Women's T20 World Cup"
+  ],
+  "Rugby World Cup": [
+    "Rugby World Cup"
+  ],
+  "Six Nations": [
+    "Six Nations Championship",
+    "Six Nations"
+  ]
+}
