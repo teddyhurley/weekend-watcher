@@ -2,7 +2,7 @@
 (function(){
  'use strict';
  const $=id=>document.getElementById(id),D=window.WatchData,R=window.WatcherDates,STORE='weekend-watcher-dates-v1';
- let busy=false,lastReport=null,selection;
+ let busy=false,lastReport=null,selection,hosted=false,liveReady=true;
  function zone(){
   if(window.WatcherUI)return window.WatcherUI.getState().timezone;
   try{for(const key of ['weekend-watcher-discovery-v9','weekend-watcher-discovery-v8','weekend-watcher-discovery-v7','weekend-watcher-discovery-v6']){const saved=JSON.parse(localStorage.getItem(key)||'null');if(R.validZone(saved?.timezone))return saved.timezone;}}catch(_){}
@@ -18,9 +18,27 @@
   $('date-help').textContent=`Dates in ${zone().replaceAll('_',' ')} · Choose through ${new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',timeZone:'UTC'}).format(new Date(max+'T12:00:00Z'))}.`;
  }
  function message(heading,text){$('feed-label').textContent=heading;$('feed-message').textContent=text;}
+ function hosting(status){
+  hosted=status.localOnly===false;if(!hosted)return;
+  liveReady=status.configured;
+  const connection=document.querySelector('.live-bar a');if(connection){connection.href='/demo/';connection.textContent='Try interactive demo ↗';}
+  for(const h of document.querySelectorAll('#about-dialog h3'))if(h.textContent==='What is connected')h.nextElementSibling.textContent='Live schedules come from connected sports providers, with official baseball schedules and optional college-football ranking context. Schedules and coverage can change. Unknown tags and missing stats are not invented. The separate interactive demo uses clearly labeled fictional fixtures.';
+ }
+ function unavailable(text){
+  liveReady=false;message('LIVE SCHEDULE UNAVAILABLE',text);
+  lastReport={...selection,games:[],mappedLeagues:[],unmappedLeagues:[],issues:[],error:text,loading:false};window.WatcherUI.replaceFeed(lastReport);
+  if(!$('hosted-unavailable')){
+   const box=document.createElement('section');box.id='hosted-unavailable';box.className='empty-state';box.setAttribute('role','main');box.setAttribute('aria-labelledby','hosted-unavailable-title');box.tabIndex=-1;
+   const title=document.createElement('h2');title.id='hosted-unavailable-title';title.textContent='Explore the interactive demo';
+   const copy=document.createElement('p');copy.textContent='Try the working filters, time zones and event rankings with fictional fixtures. No account or download is needed.';
+   const link=document.createElement('a');link.href='/demo/';link.className='primary-button';link.textContent='Try Weekend Watcher ↗';box.append(title,copy,link);$('main-content').before(box);
+   for(const element of [document.querySelector('.date-section'),$('filter-panel'),$('main-content')])element.classList.add('hidden');
+   const skip=document.querySelector('a.skip');if(skip){skip.href='#hosted-unavailable';skip.textContent='Skip to demo';}
+  }
+ }
  function setBusy(value){busy=value;$('date-form').setAttribute('aria-busy',String(value));document.querySelectorAll('#date-form input,#date-form button,[data-date-preset]').forEach(e=>e.disabled=value);$('reload-feed').textContent=value?'Finding events…':'Show events';}
  async function load(){
-  if(busy)return;
+  if(busy||!liveReady)return;
   const r={startDate:$('date-start').value,endDate:$('date-end').value},tz=zone(),invalid=R.validate(r.startDate,r.endDate,new Date(),tz);
   $('date-error').textContent=invalid;if(invalid)return;
   selection={...selection,...r};remember();displayDates();setBusy(true);
@@ -28,7 +46,7 @@
   window.WatcherUI.replaceFeed(empty);message('FINDING EVENTS','Checking schedules for your dates. Longer ranges may take a few minutes.');
   try{
    const response=await fetch('/api/feed?'+new URLSearchParams({start:r.startDate,end:r.endDate,timezone:tz}),{signal:AbortSignal.timeout(420000)});const j=await response.json();
-   if(!response.ok){if(j.code==='setup_required'){remember();location.assign('/setup');return;}throw Error(j.error||'The schedule could not be loaded.');}
+   if(!response.ok){if(j.code==='setup_required'&&!hosted){remember();location.assign('/setup');return;}if(j.code==='schedule_unavailable'){unavailable(j.error);return;}throw Error(j.error||'The schedule could not be loaded.');}
    lastReport=j;window.WatcherUI.replaceFeed(j);
    const count=window.WatchEngine.filterGames(j.games,{...window.WatcherUI.getState(),days:R.DAYS,leagues:Object.keys(D.catalog),tags:[],category:'all',period:'any',minMinutes:1,includeUS:true,includeConditional:true}).length;
    const updated=new Date(j.fetchedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
@@ -55,19 +73,19 @@
    unmatchedProviderLeagueCount:r.unmatchedProviderLeagueCount,unmatchedProviderLeagues:r.unmatchedProviderLeagues,unmatchedProviderLeaguesTruncated:r.unmatchedProviderLeaguesTruncated,
    officialBaseball:r.officialBaseball,pendingBaseball:r.pendingBaseball,baseballRejections:r.baseballRejections,skipExamples:r.skipExamples,mappedLeagues:r.mappedLeagues,unmappedLeagues:r.unmappedLeagues,ambiguous:r.ambiguous,
    notes:r.reportNotes
-  },null,2):'No successful connection yet. Use Connection to enter your key on this computer.';
+  },null,2):hosted?'No live schedule has been loaded. The interactive demo is available separately.':'No successful connection yet. Use Connection to enter your key on this computer.';
   dialog.append(body);const close=document.createElement('button');close.className='outline-button';close.textContent='Close';close.onclick=()=>dialog.close();dialog.append(close);dialog.showModal();
  }
  async function init(){
   if(location.protocol==='file:'){message('START THE LOCAL APP','Open Start-Weekend-Watcher.command to use the app.');return;}
-  restore();displayDates();D.startDate=selection.startDate;D.endDate=selection.endDate;
+  restore();displayDates();D.startDate=selection.startDate;D.endDate=selection.endDate;D.feed={loading:true,games:[]};
   const script=document.createElement('script');script.src='/src/app.js';script.onload=async()=>{
    $('date-form').onsubmit=e=>{e.preventDefault();load();};$('feed-report').onclick=report;
    for(const id of ['date-start','date-end'])$(id).oninput=()=>{selection.preset='custom';document.querySelectorAll('[data-date-preset]').forEach(b=>b.setAttribute('aria-pressed','false'));$('date-error').textContent=R.validate($('date-start').value,$('date-end').value,new Date(),zone());};
    document.querySelectorAll('[data-date-preset]').forEach(b=>b.onclick=()=>{selection={preset:b.dataset.datePreset,...R.preset(b.dataset.datePreset,new Date(),zone())};displayDates();load();});
    window.addEventListener('watcher-zone-change',()=>{selection=R.restore(selection,new Date(),zone());displayDates();remember();load();});
-   try{const r=await fetch('/api/status');const j=await r.json();if(!r.ok)throw Error();if(!j.configured){remember();location.replace('/setup');return;}load();}catch(_){message('LOCAL SERVER NEEDED','Start Weekend Watcher, then reload this page.');}
-  };script.onerror=()=>message('APP UNAVAILABLE','The interface could not be loaded. Restart the local server.');document.body.append(script);
+   try{const r=await fetch('/api/status');const j=await r.json();if(!r.ok)throw Error();hosting(j);if(!j.configured){if(hosted){unavailable('Live schedules are not connected on this site yet. The interactive demo is ready to explore.');return;}remember();location.replace('/setup');return;}load();}catch(_){message('CONNECTION UNAVAILABLE','The schedule service could not be reached. Please reload and try again.');}
+  };script.onerror=()=>message('APP UNAVAILABLE','The interface could not be loaded. Please reload and try again.');document.body.append(script);
  }
  init();
 })();

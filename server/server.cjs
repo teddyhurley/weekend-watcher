@@ -9,11 +9,18 @@ function loadKey(root){return loadEnvKey(root,'THESPORTSDB_API_KEY');}
 function writeEnvKey(root,name,value){const envPath=path.join(root,'.env');let lines=[];try{lines=fs.readFileSync(envPath,'utf8').split(/\r?\n/).filter(Boolean);}catch(_){}const prefix=name+'=';lines=lines.filter(x=>!x.startsWith(prefix));lines.push(prefix+value);const fd=fs.openSync(envPath,'w',0o600);try{fs.fchmodSync(fd,0o600);fs.writeFileSync(fd,lines.join('\n')+'\n');}finally{fs.closeSync(fd);}}
 // No general-purpose static file handler. Secrets, source data, caches and server files are NEVER public.
 const PUBLIC=new Map([['/','index.html'],['/index.html','index.html'],['/setup','public/setup.html'],['/setup.js','public/setup.js'],['/setup.css','public/setup.css'],...['app','engine','tags','scope','audience','catalog','zones','dates','live'].map(x=>[`/src/${x}.js`,`src/${x}.js`]),['/src/styles.css','src/styles.css']]);
-function createApp({root=ROOT,key=process.env.THESPORTSDB_API_KEY||loadKey(root),cfbdKey=process.env.CFBD_API_KEY||loadEnvKey(root,'CFBD_API_KEY'),clientFactory=k=>new SportsDB(k),cfbdFactory=k=>new CollegeFootballData(k),mlbClient=(require.main===module?new MLBFeed():null),baseballClient=(require.main===module?new Baseball.OfficialBaseballFeed():null),clock=()=>Date.now(),recoveryLimit=200,scheduleBudgetMs=240000}={}){
+const DEMO=new Map([['/demo/','demo-dist/index.html'],['/demo/index.html','demo-dist/index.html'],...['app','engine','tags','scope','audience','catalog','zones','dates','demo'].map(x=>[`/demo/src/${x}.js`,`demo-dist/src/${x}.js`]),['/demo/src/styles.css','demo-dist/src/styles.css']]);
+const SETUP=new Set(['/setup','/setup/','/setup.js','/setup.css','/api/setup','/api/setup-state']);
+function hostingOrigin(value){
+ try{const url=new URL(value);if(url.protocol!=='https:'||url.username||url.password||url.search||url.hash||url.pathname!=='/')throw Error();return url.origin;}
+ catch(_){throw Error('Public hosting requires PUBLIC_ORIGIN (or RENDER_EXTERNAL_URL) to be an HTTPS origin, such as https://weekend-watcher.example.com.');}
+}
+function createApp({root=ROOT,publicMode=process.env.WEEKEND_WATCHER_PUBLIC==='true',publicOrigin=process.env.PUBLIC_ORIGIN||process.env.RENDER_EXTERNAL_URL||'',key=process.env.THESPORTSDB_API_KEY||(publicMode?'':loadKey(root)),cfbdKey=process.env.CFBD_API_KEY||(publicMode?'':loadEnvKey(root,'CFBD_API_KEY')),clientFactory=k=>new SportsDB(k),cfbdFactory=k=>new CollegeFootballData(k),mlbClient=(require.main===module?new MLBFeed():null),baseballClient=(require.main===module?new Baseball.OfficialBaseballFeed():null),clock=()=>Date.now(),recoveryLimit=200,scheduleBudgetMs=240000}={}){
+ const origin=publicMode?hostingOrigin(publicOrigin):null,publicHost=origin?new URL(origin).host:null,refreshStarts=[];
  let client=key?clientFactory(key):null,cfbd=cfbdKey?cfbdFactory(cfbdKey):null,mlb=mlbClient,map=null,mapAt=0,connecting=false;
  const csrf=crypto.randomBytes(32).toString('hex'),cache=new Map(),pending=new Map(),cfbCalendarCache=new Map(),dayCache=new Map();
  const mappingState=()=>{const eligible=A.eligibleNames().filter(l=>D.catalog[l]),primary=(map?.catalogueMapped||[]).filter(l=>eligible.includes(l)),secondary=cfbd&&eligible.includes('NCAA FBS')?['NCAA FBS']:[],mapped=[...new Set([...primary,...secondary])];return{eligible,primary,secondary,mapped,unmapped:eligible.filter(l=>!mapped.includes(l))};};
- const meta=()=>{const m=mappingState(),secondary=[...(cfbd?['CollegeFootballData']:[]),...(mlb?['MLB official schedule']:[])];return{configured:Boolean(client),provider:'TheSportsDB',localOnly:true,mappedLeagues:m.mapped,unmappedLeagues:m.unmapped,ambiguous:map?.ambiguous||[],coverageAdmission:{audienceThreshold:A.THRESHOLD,eligible:m.eligible.length,catalogueCandidates:Object.keys(D.catalog).length},connections:{theSportsDB:Boolean(client),collegeFootballData:Boolean(cfbd),mlbOfficial:Boolean(mlb)},secondaryProviders:secondary};};
+ const meta=()=>{const m=mappingState(),secondary=[...(cfbd?['CollegeFootballData']:[]),...(mlb?['MLB official schedule']:[])];return{configured:Boolean(client),provider:'TheSportsDB',localOnly:!publicMode,...(publicMode?{demoUrl:'/demo/'}:{}),mappedLeagues:m.mapped,unmappedLeagues:m.unmapped,ambiguous:map?.ambiguous||[],coverageAdmission:{audienceThreshold:A.THRESHOLD,eligible:m.eligible.length,catalogueCandidates:Object.keys(D.catalog).length},connections:{theSportsDB:Boolean(client),collegeFootballData:Boolean(cfbd),mlbOfficial:Boolean(mlb)},secondaryProviders:secondary};};
  async function getMapping(){if(!map||clock()-mapAt>86400000){map=N.leagueMap(await client.leagues());mapAt=clock();}return map;}
  // Reuse overlapping date requests for 15 minutes; no disk cache or credentials.
  async function scheduleDay(day,league=''){
@@ -154,6 +161,15 @@ function createApp({root=ROOT,key=process.env.THESPORTSDB_API_KEY||loadKey(root)
   if(pending.has(k))return pending.get(k);
   // Reject another date-range fetch while one is running, so clicking cannot spend unbounded quota.
   if(pending.size)throw new FeedError('busy','Another date range is loading. Try again when it finishes.');
+  // Public visitors share one small refresh budget. Cached ranges and a matching
+  // in-flight request are free; arbitrary date changes cannot continuously spend quota.
+  // Deliberately do not trust forwarded client IPs or keep visitor identifiers.
+  if(publicMode){
+   const now=clock();while(refreshStarts.length&&now-refreshStarts[0]>=TTL)refreshStarts.shift();
+   const retryAt=Math.max(refreshStarts.length?refreshStarts.at(-1)+60000:0,refreshStarts.length>=4?refreshStarts[0]+TTL:0);
+   if(now<retryAt){const e=new FeedError('refresh_limited','Live schedules are refreshing at a shared limit. Try again shortly, or explore the interactive demo.');e.retryAfter=Math.max(1,Math.ceil((retryAt-now)/1000));throw e;}
+   refreshStarts.push(now);
+  }
   const job=buildFeed(start,end).then(data=>{cache.set(k,{time:clock(),data});while(cache.size>4)cache.delete(cache.keys().next().value);return data;}).catch(e=>{
    if(old&&clock()-old.time<6*3600000)return {...old.data,stale:true,partial:true,issues:[...old.data.issues,{message:'Refresh failed. Showing an older cached schedule; check event status.'}]};throw e;
   }).finally(()=>pending.delete(k));pending.set(k,job);return job;
@@ -163,11 +179,13 @@ function createApp({root=ROOT,key=process.env.THESPORTSDB_API_KEY||loadKey(root)
  const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Frame-Options','DENY');
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
-  const port=server.address()?.port,allowedHosts=[`127.0.0.1:${port}`,`localhost:${port}`];
-  if(!allowedHosts.includes(req.headers.host)||!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress))return json(res,403,{error:'Local access only.'});
+  const port=server.address()?.port,allowedHosts=publicMode?[publicHost]:[`127.0.0.1:${port}`,`localhost:${port}`];
+  if(!allowedHosts.includes(req.headers.host)||(!publicMode&&!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress)))return json(res,403,{error:publicMode?'Host is not allowed.':'Local access only.'});
   let url;try{url=new URL(req.url,'http://'+req.headers.host);}catch(_){return json(res,400,{error:'Invalid request.'});}
-  if(req.headers.origin&&!allowedHosts.map(h=>'http://'+h).includes(req.headers.origin))return json(res,403,{error:'Cross-origin access is disabled.'});
+  if(req.headers.origin&&!(publicMode?[origin]:allowedHosts.map(h=>'http://'+h)).includes(req.headers.origin))return json(res,403,{error:'Cross-origin access is disabled.'});
   try{
+   if(publicMode&&SETUP.has(url.pathname))return json(res,404,{error:'Not found.'});
+   if((req.method==='GET'||req.method==='HEAD')&&url.pathname==='/healthz')return json(res,200,{ok:true,version:VERSION});
    if(req.method==='GET'&&url.pathname==='/api/status')return json(res,200,meta());
    if(req.method==='GET'&&url.pathname==='/api/setup-state')return json(res,200,{configured:Boolean(client),sportsConfigured:Boolean(client),collegeFootballDataConfigured:Boolean(cfbd),token:csrf});
    if(req.method==='POST'&&url.pathname==='/api/setup'){
@@ -189,6 +207,7 @@ function createApp({root=ROOT,key=process.env.THESPORTSDB_API_KEY||loadKey(root)
     }finally{connecting=false;}
    }
    if(req.method==='GET'&&url.pathname==='/api/feed'){
+    if(!client&&publicMode)return json(res,503,{error:'Live schedules are not connected on this site yet. Explore the interactive demo with clearly labeled fictional fixtures.',code:'schedule_unavailable',demoUrl:'/demo/'});
     if(!client)return json(res,428,{error:'Connect your Premium API key on the local setup screen.',code:'setup_required'});
     const start=url.searchParams.get('start'),end=url.searchParams.get('end'),zone=url.searchParams.get('timezone')||'UTC';
     const invalid=Dates.validate(start,end,new Date(clock()),zone);
@@ -196,17 +215,21 @@ function createApp({root=ROOT,key=process.env.THESPORTSDB_API_KEY||loadKey(root)
     return json(res,200,await feed(start,end));
    }
    if(req.method!=='GET')return json(res,405,{error:'Method not allowed.'});
-   const target=PUBLIC.get(url.pathname);if(!target)return json(res,404,{error:'Not found.'});
-   const ext=path.extname(target);res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[ext]+'; charset=utf-8');res.end(fs.readFileSync(path.join(root,target)));
-  }catch(e){const code=e instanceof FeedError?e.code:'internal';json(res,code==='busy'?409:code==='request'?400:502,{code,error:e instanceof FeedError?e.message:'The request could not be completed. No sample data has been substituted.'});}
+   if(url.pathname==='/demo'){res.writeHead(308,{Location:'/demo/'});return res.end();}
+   const target=DEMO.get(url.pathname)||PUBLIC.get(url.pathname);if(!target)return json(res,404,{error:'Not found.'});
+   let content;try{content=fs.readFileSync(path.join(root,target));}catch(e){if(e.code==='ENOENT')return json(res,404,{error:'Not found.'});throw e;}
+   const ext=path.extname(target);res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[ext]+'; charset=utf-8');res.end(content);
+  }catch(e){const code=e instanceof FeedError?e.code:'internal';if(code==='refresh_limited')res.setHeader('Retry-After',String(e.retryAfter));json(res,code==='refresh_limited'?429:code==='busy'?409:code==='request'?400:502,{code,error:publicMode&&code==='authentication'?'The live schedule connection needs attention. You can still explore the interactive demo.':e instanceof FeedError?e.message:'The request could not be completed. No sample data has been substituted.',...(publicMode?{demoUrl:'/demo/'}:{})});}
  });
  server.requestTimeout=420000;server.headersTimeout=20000;
  return {server,feed,meta};
 }
 if(require.main===module){
  if(+process.versions.node.split('.')[0]<22){console.error('Install Node.js 22 or newer, then start again.');process.exit(1);}
- const port=Number(process.env.PORT||4317);const {server}=createApp();
- server.on('error',e=>{console.error(e.code==='EADDRINUSE'?'Weekend Watcher is already running, or port 4317 is occupied.':'Could not start the local app.');process.exit(1);});
- server.listen(port,'127.0.0.1',()=>console.log(`Weekend Watcher: http://127.0.0.1:${port}\nKeep this Terminal window open. Stop with Control+C.\nYour API key is never printed or served to visitors.`));
+ const port=Number(process.env.PORT||4317),publicMode=process.env.WEEKEND_WATCHER_PUBLIC==='true';let app;
+ try{app=createApp();}catch(_){console.error('Could not start Weekend Watcher. Check the hosting origin and provider-key format in the server environment.');process.exit(1);}
+ const {server}=app;
+ server.on('error',e=>{console.error(e.code==='EADDRINUSE'?`Weekend Watcher is already running, or port ${port} is occupied.`:'Could not start Weekend Watcher.');process.exit(1);});
+ server.listen(port,publicMode?'0.0.0.0':'127.0.0.1',()=>console.log(publicMode?`Weekend Watcher is listening on port ${port}. Public setup is disabled.\nYour API key is never printed or served to visitors.`:`Weekend Watcher: http://127.0.0.1:${port}\nKeep this Terminal window open. Stop with Control+C.\nYour API key is never printed or served to visitors.`));
 }
 module.exports={createApp,loadKey};

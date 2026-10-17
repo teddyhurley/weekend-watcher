@@ -316,3 +316,10 @@ dialog h3 { font-size: 15px; margin-top: 24px; }
   .dialog-bottom { bottom: -20px; }
 }
 @media(prefers-reduced-motion:reduce) { *, *:before, *:after { transition: none !important; scroll-behavior: auto !important; } }
+
+/* The public portfolio demo always identifies its fictional data. */
+.demo-mode-banner { padding: 16px 18px; margin: 8px 0 18px; border: 1px solid #536d87; border-left: 4px solid var(--accent); border-radius: 8px; background: #192838; color: #d7e5f5; font-size: 12px; flex-wrap: wrap; }
+.demo-mode-banner > span { color: #dceaff; font-size: 10px; letter-spacing: .7px; white-space: normal; }
+.demo-mode-banner i { background: var(--accent); flex: 0 0 6px; }
+.demo-mode-banner p { min-width: min(100%, 270px); }
+@media(max-width: 620px) { .demo-mode-banner { gap: 10px; } .demo-mode-banner > span, .demo-mode-banner p { flex-basis: 100%; } }
