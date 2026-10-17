@@ -1,10 +1,31 @@
 # Weekend Watcher
 
+**[Open interactive demo](https://weekend-watcher-demo.onrender.com)** · [Product notes](docs/PRODUCT.md) · [How it works](docs/ARCHITECTURE.md)
+
 **Know what’s on. Know why it matters.**
 
-Weekend Watcher helps curious sports fans find the major occasions and unexpected discoveries worth knowing about. Choose dates, explore the world’s sporting calendar, and see the verified context behind an event.
+A sports-discovery project by **Teddy Hurley**. Choose your dates and viewing hours, then find major occasions and unfamiliar competitions worth exploring. Event details explain the sporting stakes behind each recommendation.
 
-Version **0.13.0** keeps the dark interface and the Weekend Watcher name, while expanding beyond weekends.
+The public demo opens in your browser with no account, download or API setup. It uses **clearly labeled fictional events** to demonstrate the interface, filters and ranking engine. It is not a current sports schedule.
+
+## Try it in a minute
+
+1. **Choose your dates.** Start with Today, This weekend or Next 7 days.
+2. **Find a new sport.** Expand Fine-tune your view and try Discover something.
+3. **Inspect the recommendation.** Open an event to see the stakes, story tags and how it fits your viewing window.
+4. **Adjust the fit.** Change your time zone or viewing hours, filter for championships, or turn on Avoid overlaps.
+
+## Explore the work
+
+- **[Product notes](docs/PRODUCT.md):** the original problem, scope choices, iteration and next learning goal.
+- **[Architecture](docs/ARCHITECTURE.md):** calendar rules, ranking and provider integration.
+- **[Hosting](docs/HOSTING.md):** the public demo and optional server-hosted live schedules.
+- **[Tests](tests/):** ranking, time zones, date boundaries, data handling and server protections.
+
+Live schedules remain available through the Node.js app with your own provider credentials. The public demo and live data are separate modes; a failed live connection never silently becomes fictional events.
+
+<details>
+<summary><strong>Run locally, connect live schedules and inspect the implementation</strong></summary>
 
 ## Run locally
 
@@ -63,6 +84,9 @@ npm run preview
 | `docs/` | Architecture, coverage, evidence and release notes |
 
 See [Architecture](docs/ARCHITECTURE.md), [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), [Changelog](CHANGELOG.md), and [GitHub setup](docs/GITHUB.md).
+
+
+</details>
 
 ## License and data
 

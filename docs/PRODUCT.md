@@ -1,5 +1,7 @@
 # Weekend Watcher — product notes
 
+[Open interactive demo](https://weekend-watcher-demo.onrender.com) · [Code](https://github.com/teddyhurley/weekend-watcher)
+
 **Built by Teddy Hurley.** A sports-discovery prototype for finding the games worth your attention during the time you have available.
 
 ## The problem
