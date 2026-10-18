@@ -1,9 +1,3 @@
-# Teddy Hurley
-
-Stanford GSB MBA ’28. Previously in commercial analytics at FanDuel.
-
-I build tools that turn data into useful decisions. Explore the projects below.
-
 ### [Weekend Watcher](https://weekend-watcher.onrender.com)
 
 Find sporting occasions that fit your available time, with live schedules and explanations of what makes each event worth watching.
