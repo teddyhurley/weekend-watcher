@@ -1,14 +1,16 @@
 # Weekend Watcher
 
-**[Open interactive demo](https://weekend-watcher-demo.onrender.com)** · [Product notes](docs/PRODUCT.md) · [How it works](docs/ARCHITECTURE.md)
+**[Open app](https://weekend-watcher.onrender.com)** · [PRD](docs/PRD.md) · [Product notes](docs/PRODUCT.md) · [How it works](docs/ARCHITECTURE.md)
 
 **Know what’s on. Know why it matters.**
 
 A sports-discovery project by **Teddy Hurley**. Choose your dates and viewing hours, then find major occasions and unfamiliar competitions worth exploring. Event details explain the sporting stakes behind each recommendation.
 
-The public demo opens in your browser with no account, download or API setup. It uses **clearly labeled fictional events** to demonstrate the interface, filters and ranking engine. It is not a current sports schedule.
+The public app opens in your browser with real provider schedules and no account, download or API setup for visitors. Provider keys stay on the server. A fresh schedule request can take several minutes; source gaps and incomplete results are disclosed in the app.
 
-## Try it in a minute
+For a quick look at the interface, the separate **[fictional sample demo](https://weekend-watcher-demo.onrender.com)** demonstrates the filters and ranking engine without waiting for providers. It is clearly labeled and is not a current sports schedule.
+
+## Try it
 
 1. **Choose your dates.** Start with Today, This weekend or Next 7 days.
 2. **Find a new sport.** Expand Fine-tune your view and try Discover something.
@@ -17,12 +19,13 @@ The public demo opens in your browser with no account, download or API setup. It
 
 ## Explore the work
 
+- **[Product requirements (PRD)](docs/PRD.md):** target users, scope, acceptance criteria, operating constraints and proposed success measures.
 - **[Product notes](docs/PRODUCT.md):** the original problem, scope choices, iteration and next learning goal.
 - **[Architecture](docs/ARCHITECTURE.md):** calendar rules, ranking and provider integration.
-- **[Hosting](docs/HOSTING.md):** the public demo and optional server-hosted live schedules.
+- **[Hosting](docs/HOSTING.md):** the live service, private server credentials and separate fictional demo.
 - **[Tests](tests/):** ranking, time zones, date boundaries, data handling and server protections.
 
-Live schedules remain available through the Node.js app with your own provider credentials. The public demo and live data are separate modes; a failed live connection never silently becomes fictional events.
+The live service and fictional demo are separate modes; a failed live connection never silently becomes fictional events. You can also run the Node.js app locally with your own provider credentials.
 
 <details>
 <summary><strong>Run locally, connect live schedules and inspect the implementation</strong></summary>
@@ -77,7 +80,7 @@ npm run preview
 | Path | Purpose |
 | --- | --- |
 | `src/` | Browser interface, calendar rules, ranking and curated catalogue |
-| `server/` | Local HTTP server and provider adapters |
+| `server/` | HTTP server, public-hosting protections and provider adapters |
 | `public/` | Local connection setup |
 | `config/` | Provider league aliases |
 | `tests/` | Active automated suites, small fixtures and design preview |

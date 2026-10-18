@@ -1,6 +1,6 @@
 # Weekend Watcher — product notes
 
-[Open interactive demo](https://weekend-watcher-demo.onrender.com) · [Code](https://github.com/teddyhurley/weekend-watcher)
+[Open app](https://weekend-watcher.onrender.com) · [PRD](PRD.md) · [Code](https://github.com/teddyhurley/weekend-watcher)
 
 **Built by Teddy Hurley.** A sports-discovery prototype for finding the games worth your attention during the time you have available.
 
@@ -19,7 +19,7 @@ This is a personal product project. Its discovery and iterations came from the o
 3. Open an event to inspect why it ranks. Use championship, playoff or ranked-matchup tags to narrow the list.
 4. Try **Avoid overlaps** to explore a sequence that fits your time.
 
-The public interactive demo uses visibly labeled fictional events. The interface, time-window matching and ranking engine are the same components used by the live app. The examples illustrate the behavior; they do not establish current schedules, live coverage or prediction accuracy.
+The public app uses real provider schedules, with credentials held on the server. Visitors need no account, API key or file import. A fresh request can take several minutes, and source gaps remain visible. The separate [fictional sample demo](https://weekend-watcher-demo.onrender.com) uses the same interface, time-window matching and ranking engine with visibly labeled examples. Those examples illustrate behavior without establishing current schedules or live coverage.
 
 ## Decisions that shaped the product
 
@@ -39,9 +39,9 @@ The browser uses JavaScript for date selection, time-zone conversion, filtering,
 
 Both browser and server validate the inclusive range from today through 28 days ahead. Local-date filtering accounts for UTC buffer dates and daylight-saving changes. The server caches overlapping requests and bounds recovery work when a provider limits a response.
 
-The public demo is a separate static build. It includes only approved browser assets, needs no API keys and makes no sports-provider requests. Its fictional dates move with the calendar, so the interaction remains usable when a recruiter opens the link later. Live hosting keeps provider credentials on the server and disables the local credential-setup screens for public visitors.
+The live app runs as a public Node.js service. Provider credentials stay on the server, and local credential-setup screens are disabled for public visitors. Shared caching and refresh limits bound unauthenticated provider use. A separate static demo includes only approved browser assets, needs no API keys and makes no sports-provider requests. Its fictional dates move with the calendar, so the interaction remains usable when a recruiter opens the link later.
 
-See [Architecture](ARCHITECTURE.md), [Hosting](HOSTING.md), [Story tags](TAGS.md) and [Coverage admission](COVERAGE-ADMISSION.md) for implementation details.
+See the [PRD](PRD.md) for requirements and proposed measures, and [Architecture](ARCHITECTURE.md), [Hosting](HOSTING.md), [Story tags](TAGS.md) and [Coverage admission](COVERAGE-ADMISSION.md) for implementation details.
 
 ## Validation and next learning goal
 
